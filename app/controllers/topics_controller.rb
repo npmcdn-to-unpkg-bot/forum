@@ -11,7 +11,7 @@ class TopicsController < ApplicationController
   # GET /topics/1
   # GET /topics/1.json
   def show
-    @comments = Comment.all || []
+    @comments = Topic.find(params[:id]).comments || []
   end
 
   # GET /topics/new
@@ -91,7 +91,10 @@ class TopicsController < ApplicationController
   def vote
     begin
       if current_user.present?
+        ucount = dcount = 0
         vote = Vote.find_by(user_id:current_user.id ,comment_id:params[:id].to_i)
+        ucount = Comment.find(params[:id]).up_votes.count
+        dcount = Comment.find(params[:id]).down_votes.count
         if vote.present?
           if params[:up] == 'true'
             up = true
@@ -102,12 +105,12 @@ class TopicsController < ApplicationController
             return
           end
           if vote.up  == up
-            render json: { do:0  }
+            render json: { do:0 ,more:ucount  }
             return
           else
             vote.up = up
             if vote.save
-              render json: { do:1  }
+              render json: { do:1 ,more: ucount+1 }
               return
             else
               render json: {msg:'error'}
@@ -131,7 +134,7 @@ class TopicsController < ApplicationController
                                  }
           )
           if vote.save
-            render json: { do:1  }
+            render json: { do:1,more: ucount+1  }
             return
           else
             render json: {msg:'error'}

@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Forum</title>
+  <link href="https://npmcdn.com/basscss@8.0.1/css/basscss.min.css" rel="stylesheet">
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
@@ -9,11 +10,11 @@
 <body>
 <nav class="navbar navbar-inverse">
   <div class="container">
-    <div class="navbar-header">
+    <div class="navbar-header flex justify-start">
       <%= link_to 'Devise Demo', root_path, class: 'navbar-brand' %>
     </div>
     <div id="navbar">
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav flex justify-center">
         <li><%= link_to 'Home', root_path %></li>
       </ul>
       <ul class="nav navbar-nav pull-right">
@@ -22,8 +23,8 @@
               <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <span class="caret"></span>
               </a>
-              <ul class="dropdown-menu" role="menu">
-                <li><%= link_to 'Profile', edit_user_registration_path %></li>
+              <ul class="dropdown-menu flex justify-end" role="menu">
+                <li class="mr4"><%= link_to 'Profile', edit_user_registration_path %></li>
                 <li><%= link_to 'Log out', destroy_user_session_path, method: :delete %></li>
               </ul>
             </li>

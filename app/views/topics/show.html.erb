@@ -1,31 +1,31 @@
 <p id="notice"><%= notice %></p>
 
-<p>
+<p class="flex justify-center h3">
   <strong>Name:</strong>
   <%= @topic.name %>
 </p>
 
-<h1>Listing Comments</h1>
+<h1 class="flex justify-center">Listing Comments</h1>
 
-<table>
+<table class="mb3">
   <thead>
-  <tr>
-    <th>Content less</th>
-    <th>Content more</th>
-    <th>Email</th>
-    <th></th>
-    <th></th>
+  <tr class="flex-container">
+    <th class="flex-item">Content less</th>
+    <th class="flex-item">Content more</th>
+    <th class="flex-item">Email</th>
+    <th class="flex-item">Up Vote</th>
+    <th class="flex-item">Down Vote</th>
   </tr>
   </thead>
 
   <tbody>
   <% @comments.each do |comment| %>
-      <tr>
-        <td><%= comment.content_less %></td>
-        <td class="more <%=comment.id%>">more</td>
-        <td><%= comment.email %></td>
-        <td><span class="up-count <%=comment.id%>" ><%= 4 %></span><span class="up <%=comment.id%>" data-count=4> Up Vote </span></td>
-        <td><span class="down-count <%=comment.id%>"><%= 5 %></span><span class="down <%=comment.id%>" data-count=4> Down Vote </span></td>
+      <tr class="flex-container">
+        <td class="flex-item p1"><%= comment.content_less %></td>
+        <td class="more <%=comment.id%> flex-item p1">more</td>
+        <td class="flex-item p1"><%= comment.email %></td>
+        <td class="flex-item p1"><span class="up-count <%=comment.id%>" ><%= 4 %></span><span class="up <%=comment.id%> ml1" data-count=4>/\</span></td>
+        <td class="flex-item p1"><span class="down-count <%=comment.id%>"><%= 5 %></span><span class="down <%=comment.id%> ml1" data-count=4>\/</span></td>
       </tr>
 
   <% end %>
@@ -45,24 +45,24 @@
         </div>
     <% end %>
 
-    <div class="field">
+    <div class="field flex justify-center">
       <%= label_tag :content %><br>
       <%= text_area_tag 'comment[content]' %>
     </div>
-    <div class="field">
+    <div class="field flex justify-center">
       <%= label_tag :email %><br>
       <%= text_field_tag 'comment[email]' %>
     </div>
-    <div class="actions">
+    <div class="actions flex justify-center">
       <%= submit_tag 'Comment' %>
     </div>
 <% end %>
-<%= link_to 'Back', topics_path %>
-<
+<p class="flex justify-center h3"> <%= link_to '< Back', topics_path %> </p>
+
 <script type="text/javascript" charset="utf-8">
 
     $(".more").click(function(){
-        id = this.classList[this.classList.length-1]
+        id = this.classList[1]
         self = this
         $.ajax({
             url: "/more_comment?id="+id,
@@ -76,10 +76,25 @@
         })
     })
     $(".up").click(function(){
-        id = this.classList[this.classList.length-1]
+        id = this.classList[1]
         self = this
         $.ajax({
             url: "/vote?up=true&id="+id,
+            success: function(response) {
+                if(response.do == '1')
+                    $('.up-count.'+id).text(response.more)
+                var amount = parseFloat($('.up.'+id).data('count').toFixed(2));
+            },
+            error:function(){
+
+            }
+        })
+    })
+    $(".down").click(function(){
+        id = this.classList[1]
+        self = this
+        $.ajax({
+            url: "/vote?up=false&id="+id,
             success: function(response) {
                 if(response.do == '1')
                     $('.up-count.'+id).text(response.more)
