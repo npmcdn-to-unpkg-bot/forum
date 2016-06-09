@@ -1,8 +1,13 @@
 Rails.application.routes.draw do
+  devise_for :users
   root 'topics#index'
-  resources :votes
-  resources :comments
-  resources :topics
+  resources :topics do
+    member do
+      post 'comment' => 'topics#comment'
+    end
+  end
+  get '/vote' => 'topics#vote'
+  get '/more_comment' => 'topics#more_comment'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

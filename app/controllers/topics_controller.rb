@@ -1,5 +1,6 @@
 class TopicsController < ApplicationController
-  before_action :set_topic, only: [:show, :edit, :update, :destroy]
+
+  before_action :set_topic, only: [:show, :edit, :update, :destroy ,:comment]
 
   # GET /topics
   # GET /topics.json
@@ -10,6 +11,7 @@ class TopicsController < ApplicationController
   # GET /topics/1
   # GET /topics/1.json
   def show
+    @comments = Comment.all || []
   end
 
   # GET /topics/new
@@ -61,6 +63,104 @@ class TopicsController < ApplicationController
     end
   end
 
+  def comment
+    begin
+      data=comment_params
+      @comment = @topic.comments.new(
+                                    {
+                                        content_less: data['content'][0..400],
+                                        content_more: data['content'][401..-1] || nil,
+                                        email:data[:email]
+                                    }
+      )
+      respond_to do |format|
+        if @comment.save
+          format.html { redirect_to @topic, notice: 'Comment was saved successfuly' }
+          format.json { render :show, status: :created, location: @topic }
+        else
+          format.html { redirect_to @topic ,alert: 'Unable to save comment' }
+          format.json { render json: @comment.errors, status: :unprocessable_entity }
+        end
+      end
+    rescue StandardError=>e
+      puts " Error occured: #{e} "
+      render json: {msg:' exception occured'}
+    end
+  end
+
+  def vote
+    begin
+      if current_user.present?
+        vote = Vote.find_by(user_id:current_user.id ,comment_id:params[:id].to_i)
+        if vote.present?
+          if params[:up] == 'true'
+            up = true
+          elsif params[:up] == 'false'
+            up = false
+          else
+            render json: {msg:'error'}
+            return
+          end
+          if vote.up  == up
+            render json: { do:0  }
+            return
+          else
+            vote.up = up
+            if vote.save
+              render json: { do:1  }
+              return
+            else
+              render json: {msg:'error'}
+              return
+            end
+          end
+        else
+          if params[:up] == 'true'
+            up = true
+          elsif params[:up] == 'false'
+            up = false
+          else
+            render json: {msg:'error'}
+            return
+          end
+          vote = Vote.new(
+                                 {
+                                     up:up,
+                                     user_id:current_user.id,
+                                     comment_id:params[:id]
+                                 }
+          )
+          if vote.save
+            render json: { do:1  }
+            return
+          else
+            render json: {msg:'error'}
+            return
+          end
+        end
+      else
+        flash[:alert] = 'Login to vote'
+        render json: {msg:'Login first'}
+        return
+      end
+    rescue StandardError=>e
+      puts " Error occured: #{e} "
+      render json: {msg:' exception occured'}
+      return
+    end
+
+  end
+
+  def more_comment
+    begin
+      comment = Comment.find(params[:id].to_i)
+      more_content = comment.present? ? comment.content_more: '' || ''
+      render json: { more:more_content }
+    rescue StandardError=>e
+      puts " Error occured: #{e} "
+      render json: {msg:' exception occured'}
+    end
+  end
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_topic
@@ -70,5 +170,9 @@ class TopicsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def topic_params
       params.require(:topic).permit(:name)
+    end
+
+    def comment_params
+      params.require(:comment).permit(:content,:email)
     end
 end

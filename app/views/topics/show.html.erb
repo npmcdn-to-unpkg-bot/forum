@@ -5,5 +5,89 @@
   <%= @topic.name %>
 </p>
 
-<%= link_to 'Edit', edit_topic_path(@topic) %> |
+<h1>Listing Comments</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Content less</th>
+    <th>Content more</th>
+    <th>Email</th>
+    <th></th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @comments.each do |comment| %>
+      <tr>
+        <td><%= comment.content_less %></td>
+        <td class="more <%=comment.id%>">more</td>
+        <td><%= comment.email %></td>
+        <td><span class="up-count <%=comment.id%>" ><%= 4 %></span><span class="up <%=comment.id%>" data-count=4> Up Vote </span></td>
+        <td><span class="down-count <%=comment.id%>"><%= 5 %></span><span class="down <%=comment.id%>" data-count=4> Down Vote </span></td>
+      </tr>
+
+  <% end %>
+  </tbody>
+</table>
+
+<%= form_tag  comment_topic_path , :method => 'post' do |f| %>
+    <% if @comment.present? && @comment.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@comment.errors.count, "error") %> prohibited this comment from being saved:</h2>
+
+          <ul>
+            <% @comment.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+    <div class="field">
+      <%= label_tag :content %><br>
+      <%= text_area_tag 'comment[content]' %>
+    </div>
+    <div class="field">
+      <%= label_tag :email %><br>
+      <%= text_field_tag 'comment[email]' %>
+    </div>
+    <div class="actions">
+      <%= submit_tag 'Comment' %>
+    </div>
+<% end %>
 <%= link_to 'Back', topics_path %>
+<
+<script type="text/javascript" charset="utf-8">
+
+    $(".more").click(function(){
+        id = this.classList[this.classList.length-1]
+        self = this
+        $.ajax({
+            url: "/more_comment?id="+id,
+            success: function(response) {
+                if(response.more != null)
+                    $('.more.'+id).text(response.more)
+            },
+            error:function(){
+
+            }
+        })
+    })
+    $(".up").click(function(){
+        id = this.classList[this.classList.length-1]
+        self = this
+        $.ajax({
+            url: "/vote?up=true&id="+id,
+            success: function(response) {
+                if(response.do == '1')
+                    $('.up-count.'+id).text(response.more)
+                var amount = parseFloat($('.up.'+id).data('count').toFixed(2));
+            },
+            error:function(){
+
+            }
+        })
+    })
+</script>
