@@ -12,6 +12,9 @@ class TopicsController < ApplicationController
   # GET /topics/1.json
   def show
     @comments = Topic.find(params[:id]).comments.page(params[:page]).per(10) || []
+    if @comments.present?
+      @comments.reject { |e|  e.down_votes.count > 10 }
+    end
   end
 
   # GET /topics/new
