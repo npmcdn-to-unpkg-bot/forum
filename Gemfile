@@ -47,4 +47,5 @@ group :development do
 end
 
 gem 'devise', '3.4.1'
+gem 'active_model_serializers', '~> 0.10.0'
 

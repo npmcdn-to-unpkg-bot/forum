@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
 
 <h1 class="flex justify-center">Listing Topics</h1>
 
@@ -6,17 +5,13 @@
   <thead>
     <tr>
       <th class="flex justify-start h3 mb3">Name</th>
-      <th class="h3 mb3">Action</th>
     </tr>
   </thead>
 
   <tbody>
     <% @topics.each do |topic| %>
       <tr class="flex-wrap content-start">
-        <td class="col-8"><%= topic.name %></td>
-        <td class="col-2"><%= link_to 'Show', topic_path(topic,:page=>1) %></td>
-        <td class="col-2"><%= link_to 'Edit', edit_topic_path(topic) %></td>
-        <td class="col-2"><%= link_to 'Destroy', topic, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td class="col-8"><%= link_to topic.name ,topic_path(topic) %></td>
       </tr>
     <% end %>
   </tbody>
@@ -25,4 +20,3 @@
 <br>
 
 
-<p class="h3 flex justify-center"><%= link_to 'New Topic', new_topic_path %></p>

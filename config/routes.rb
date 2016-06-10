@@ -6,7 +6,8 @@ Rails.application.routes.draw do
       post 'comment' => 'topics#comment'
     end
   end
-  get '/vote' => 'topics#vote'
+  get '/upvote' => 'topics#up_vote'
+  get '/downvote' => 'topics#down_vote'
   get '/more_comment' => 'topics#more_comment'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

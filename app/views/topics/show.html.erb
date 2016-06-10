@@ -1,4 +1,3 @@
-<p id="notice"><%= notice %></p>
 
 <p class="flex justify-center h3">
   <strong>Name:</strong>
@@ -6,31 +5,30 @@
 </p>
 
 <h1 class="flex justify-center">Listing Comments</h1>
-
-<table class="mb3">
-  <thead>
-  <tr class="flex-container">
-    <th class="flex-item">Content less</th>
-    <th class="flex-item">Content more</th>
-    <th class="flex-item">Email</th>
-    <th class="flex-item">Up Vote</th>
-    <th class="flex-item">Down Vote</th>
-  </tr>
-  </thead>
-
-  <tbody>
-  <% @comments.each do |comment| %>
+<div class="scroll">
+    <table class="mb3">
+      <thead>
       <tr class="flex-container">
-        <td class="flex-item p1"><%= comment.content_less %></td>
-        <td class="more <%=comment.id%> flex-item p1">more</td>
-        <td class="flex-item p1"><%= comment.email %></td>
-        <td class="flex-item p1"><span class="up-count <%=comment.id%>" ><%= comment.up_votes.count %></span><span class="up <%=comment.id%> ml1" data-count=4><%= image_tag "like.png", :style => "width:2rem;height:2rem" %></span></td>
-        <td class="flex-item p1"><span class="down-count <%=comment.id%>"><%= comment.down_votes.count %></span><span class="down <%=comment.id%> ml1" data-count=4><%= image_tag "down.png",:style => "width:2rem;height:2rem" %></span></td>
+        <th class="flex-item">Content</th>
+        <th class="flex-item">Email</th>
+        <th class="flex-item">Up Vote</th>
+        <th class="flex-item">Down Vote</th>
       </tr>
+      </thead>
+          <tbody>
+          <% @comments.each do |comment| %>
+              <tr class="flex-container">
+                <td class="flex-item p1"><%= comment.content_less %><span class="more-content <%=comment.id%>"></span><span class="more <%=comment.id%>" style="font-size: 0.8rem;font-weight: 600;padding-left: 10px;">More</span></td>
+                <td class="flex-item p1"><%= comment.email %></td>
+                <td class="flex-item p1"><span class="up-count <%=comment.id%>" ><%= comment.up_votes.count %></span><span class="up <%=comment.id%> ml1" ><%= image_tag "like.png", :style => "width:2rem;height:2rem" %></span></td>
+                <td class="flex-item p1"><span class="down-count <%=comment.id%>"><%= comment.down_votes.count %></span><span class="down <%=comment.id%> ml1"><%= image_tag "down.png",:style => "width:2rem;height:2rem" %></span></td>
+              </tr>
 
-  <% end %>
-  </tbody>
-</table>
+          <% end %>
+          </tbody>
+    </table>
+</div>
+
 
 <%= form_tag  comment_topic_path , :method => 'post' do |f| %>
     <% if @comment.present? && @comment.errors.any? %>
@@ -47,62 +45,104 @@
 
     <div class="field flex justify-center">
       <%= label_tag :content %><br>
-      <%= text_area_tag 'comment[content]' %>
+      <%= text_area_tag 'comment[content]' ,nil,required:true %>
     </div>
     <div class="field flex justify-center">
       <%= label_tag :email %><br>
-      <%= text_field_tag 'comment[email]' %>
+      <%= text_field_tag 'comment[email]',nil,required:true %>
     </div>
     <div class="actions flex justify-center">
       <%= submit_tag 'Comment' %>
     </div>
 <% end %>
 <p class="flex justify-center h3"> <%= link_to '< Back', topics_path %> </p>
-
 <script type="text/javascript" charset="utf-8">
 
-    $(".more").click(function(){
+    $(document.body).on('click',".more",function(){
         id = this.classList[1]
         self = this
         $.ajax({
             url: "/more_comment?id="+id,
             success: function(response) {
                 if(response.more != null)
-                    $('.more.'+id).text(response.more)
+                    $('.more-content.'+id).text(response.more)
+                $('.more.'+id).css("display","none")
+
             },
             error:function(){
 
             }
         })
     })
-    $(".up").click(function(){
+    $(document.body).on('click',".up",function(){
         id = this.classList[1]
         self = this
         $.ajax({
-            url: "/vote?up=true&id="+id,
+            url: "/upvote?id="+id,
             success: function(response) {
                 if(response.do == '1')
-                    $('.up-count.'+id).text(response.more)
-                var amount = parseFloat($('.up.'+id).data('count').toFixed(2));
+                    $('.up-count.'+id).text(parseInt($('.up-count.'+id).text())+1)
+                if(response.change == '1')
+                    $('.down-count.'+id).text(parseInt($('.down-count.'+id).text())-1)
+                if(response.login == '1')
+                    alert('Please Login To Vote')
+
             },
             error:function(){
 
             }
         })
     })
-    $(".down").click(function(){
+
+    $(document.body).on('click',".down" ,function(){
         id = this.classList[1]
         self = this
         $.ajax({
-            url: "/vote?up=false&id="+id,
+            url: "/downvote?id="+id,
             success: function(response) {
                 if(response.do == '1')
-                    $('.down-count.'+id).text(response.more)
-                var amount = parseFloat($('.up.'+id).data('count').toFixed(2));
+                    $('.down-count.'+id).text(parseInt($('.down-count.'+id).text())+1)
+                if(response.change == '1')
+                    $('.up-count.'+id).text(parseInt($('.up-count.'+id).text())-1)
+                if(response.login == '1')
+                    alert('Please Login To Vote')
             },
             error:function(){
 
             }
         })
     })
+    $(window).height($(window).height()+100)
+    page = 2
+    up_vote_img = "<img style='width:2rem;height:2rem' src='/assets/like-36d598aee302378b03843cd9b66867539cb9d83b036d6752632eb2bc151efa4f.png' alt='Up Vote' />"
+    down_vote_img ="<img style='width:2rem;height:2rem' src='/assets/down-f2f3c2153f1ad3cadeb92760c48f9925743bc326eea0bee389fdd5a16870ef7d.png' alt='Down Vote' />"
+    if($('.scroll').height() > $('table').height()){
+        $('table').height($('.scroll').height()+20)
+    }
+
+    var myScroll = new IScroll('.scroll',{
+        mouseWheel: true});
+    myScroll.on( 'scrollEnd', function(){
+        if ((Math.abs(this.y) > $('table').height() - $('.scroll').height() -10) ){
+            self = this
+            $.ajax({
+                url: "/topics/" + <%= @topic.id %>+ ".json?page="+page,
+                success: function(response) {
+                    for(i = 0 ; i< response.length ;i++) {
+                        con = "<tr class='flex-container'> <td class='flex-item p1'>"+response[i].content_less+"<span class='more-content "+response[i].id+"'></span><span class='more "+response[i].id+"' style='font-size: 0.8rem;font-weight: 600;padding-left: 10px;'>More</span></td> <td class='flex-item p1'>"+response[i].email+"</td> <td class='flex-item p1'><span class='up-count "+response[i].id+"' >" +response[i].up_votes+"</span><span class='up " +response[i].id+" ml1' >" +up_vote_img +"</span></td> <td class='flex-item p1'><span class='down-count " +response[i].id+"'>"+response[i].down_votes+"</span><span class='down "+response[i].id+" ml1'>"+ down_vote_img+"</span></td></tr>"
+                        $('tbody').append(con)
+                    }
+                    if(response.con == true) {
+                        page++
+                        self.refresh()
+                    }
+
+                },
+                error:function(){
+
+                }
+            })
+        }
+    })
+
 </script>
