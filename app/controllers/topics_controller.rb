@@ -11,7 +11,7 @@ class TopicsController < ApplicationController
   # GET /topics/1
   # GET /topics/1.json
   def show
-    @comments = Topic.find(params[:id]).comments || []
+    @comments = Topic.find(params[:id]).comments.page(params[:page]).per(10) || []
   end
 
   # GET /topics/new

@@ -24,8 +24,8 @@
         <td class="flex-item p1"><%= comment.content_less %></td>
         <td class="more <%=comment.id%> flex-item p1">more</td>
         <td class="flex-item p1"><%= comment.email %></td>
-        <td class="flex-item p1"><span class="up-count <%=comment.id%>" ><%= 4 %></span><span class="up <%=comment.id%> ml1" data-count=4>/\</span></td>
-        <td class="flex-item p1"><span class="down-count <%=comment.id%>"><%= 5 %></span><span class="down <%=comment.id%> ml1" data-count=4>\/</span></td>
+        <td class="flex-item p1"><span class="up-count <%=comment.id%>" ><%= 0 %></span><span class="up <%=comment.id%> ml1" data-count=4><%= image_tag "like.png", :style => "width:2rem;height:2rem" %></span></td>
+        <td class="flex-item p1"><span class="down-count <%=comment.id%>"><%= 0 %></span><span class="down <%=comment.id%> ml1" data-count=4><%= image_tag "down.png",:style => "width:2rem;height:2rem" %></span></td>
       </tr>
 
   <% end %>
@@ -97,7 +97,7 @@
             url: "/vote?up=false&id="+id,
             success: function(response) {
                 if(response.do == '1')
-                    $('.up-count.'+id).text(response.more)
+                    $('.down-count.'+id).text(response.more)
                 var amount = parseFloat($('.up.'+id).data('count').toFixed(2));
             },
             error:function(){
